@@ -1,5 +1,6 @@
 #define LLAMA_API_INTERNAL
 //#define LLAMA_GGML_BACKEND_CUDA_TEST // for testing only - enables ggml-cuda through ggml-backend, disables partial offloading
+#include "common/grammar-parser.h"
 #include "llama.h"
 
 #include "unicode.h"
@@ -11018,4 +11019,28 @@ static void llama_log_callback_default(ggml_log_level level, const char * text, 
     (void) user_data;
     fputs(text, stderr);
     fflush(stderr);
+}
+
+llama_grammar *llama_grammar_parse(const char* grammar)
+{
+    llama_grammar *result = new llama_grammar();
+    if (grammar[0] != '\0')
+    {
+        auto parsed_grammar = grammar_parser::parse(grammar);
+
+        // will be empty (default) if there are parse errors
+        if (parsed_grammar.rules.empty())
+        {
+            fprintf(stderr, "%s: failed to parse grammar\n", __func__);
+            delete result;
+            return nullptr;
+        }
+
+        std::vector<const llama_grammar_element *> grammar_rules(parsed_grammar.c_rules());
+
+        result = llama_grammar_init(
+            grammar_rules.data(),
+            grammar_rules.size(), parsed_grammar.symbol_ids.at("root"));
+    }
+    return result;
 }

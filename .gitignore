@@ -104,3 +104,5 @@ poetry.toml
 /tests/test-tokenizer-1-bpe
 /tests/test-rope
 /tests/test-backend-ops
+
+Package.resolved

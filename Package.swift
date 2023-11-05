@@ -23,6 +23,7 @@ let package = Package(
             path: ".",
             exclude: ["ggml-metal.metal"],
             sources: [
+                "common/grammar-parser.cpp",
                 "llama.cpp",
             ],
             publicHeadersPath: "spm-headers",
